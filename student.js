@@ -51,10 +51,10 @@ function renderStudent(user) {
       <div class="stats-row">
         <div class="stat-box"><div class="num">${s.total}</div><div class="lbl">Upcoming Events</div></div>
         <div class="stat-box"><div class="num">${s.mine}</div><div class="lbl">Registered</div></div>
-        <div class="stat-box"><div class="num" style="color:${s.urgent>0?'#e53e3e':'#2b6cb0'}">${s.urgent}</div><div class="lbl">Urgent Deadlines</div></div>
+        <div class="stat-box"><div class="num" style="color:${s.urgent>0?'var(--danger)':'var(--text-main)'}">${s.urgent}</div><div class="lbl">Urgent Deadlines</div></div>
       </div>
 
-      <div class="tab-row" style="margin-bottom:20px">
+      <div class="tab-row" style="margin-bottom:30px; max-width: 600px; margin-left: auto; margin-right: auto;">
         <button class="${activeTab==='all'        ? 'active':''}" onclick="stuTab('all')">All Events</button>
         <button class="${activeTab==='registered' ? 'active':''}" onclick="stuTab('registered')">My Registrations</button>
         <button class="${activeTab==='deadlines'  ? 'active':''}" onclick="stuTab('deadlines')">⏰ Deadlines</button>

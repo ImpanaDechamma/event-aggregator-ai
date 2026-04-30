@@ -5,19 +5,20 @@ const App = (() => {
     const user = Store.getSession();
     if (page === 'organiser' && user?.role === 'organiser') { renderOrganiser(user); return; }
     if (page === 'student'   && user?.role === 'student')   { renderStudent(user);   return; }
-    renderAuth();
+    if (page === 'auth') { renderAuth(); return; }
+    renderLanding();
   }
 
   function logout() {
     Store.clearSession();
-    renderAuth();
+    renderLanding();
   }
 
   function init() {
     const user = Store.getSession();
     if (user?.role === 'organiser') { renderOrganiser(user); return; }
     if (user?.role === 'student')   { renderStudent(user);   return; }
-    renderAuth();
+    renderLanding();
   }
 
   return { navigate, logout, init };

@@ -54,9 +54,9 @@ const Store = (() => {
   function emailExists(email) {
     return getUsers().some(u => u.email === email);
   }
-  function registerUser(name, email, password) {
+  function registerUser(name, email, password, role = 'student') {
     const users = getUsers();
-    const user = { id: 'u' + Date.now(), name, email, password, role: 'student' };
+    const user = { id: 'u' + Date.now(), name, email, password, role };
     users.push(user);
     saveUsers(users);
     return user;
