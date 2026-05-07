@@ -5,12 +5,15 @@ const Store = (() => {
   const EVENTS_KEY  = 'cea_events';
   const SESSION_KEY = 'cea_session';
 
+  const FEEDBACKS_KEY = 'cea_feedbacks';
+  const TEAMS_KEY     = 'cea_teams';
+
   // Seed default accounts
   function init() {
     if (!localStorage.getItem(USERS_KEY)) {
       localStorage.setItem(USERS_KEY, JSON.stringify([
-        { id: 'u1', name: 'Alice Organiser', email: 'alice@college.edu', password: 'alice123', role: 'organiser' },
-        { id: 'u2', name: 'Bob Student',     email: 'bob@college.edu',   password: 'bob123',   role: 'student'   },
+        { id: 'u1', name: 'Alice Organiser', email: 'alice@college.edu', password: 'alice123', role: 'organiser', avatar: '', department: 'CS', github: '', linkedin: '' },
+        { id: 'u2', name: 'Bob Student',     email: 'bob@college.edu',   password: 'bob123',   role: 'student',   avatar: '', department: 'IT', github: '', linkedin: '' },
       ]));
     }
     if (!localStorage.getItem(EVENTS_KEY)) {
@@ -22,7 +25,8 @@ const Store = (() => {
           date: new Date(now + 7 * 86400000).toISOString().split('T')[0],
           deadline: new Date(now + 3 * 86400000).toISOString().split('T')[0],
           venue: 'Main Auditorium', organiser: 'Alice Organiser',
-          maxSeats: 200, registrations: ['u2'],
+          maxSeats: 200, registrations: ['u2'], waitlist: [],
+          mode: 'Offline', imageUrl: '', youtubeUrl: '', richDescription: 'Annual technical festival with hackathons, coding contests and robotics.'
         },
         {
           id: 'e2', title: 'Cultural Night', category: 'Cultural',
@@ -30,7 +34,8 @@ const Store = (() => {
           date: new Date(now + 14 * 86400000).toISOString().split('T')[0],
           deadline: new Date(now + 10 * 86400000).toISOString().split('T')[0],
           venue: 'Open Air Theatre', organiser: 'Alice Organiser',
-          maxSeats: 500, registrations: [],
+          maxSeats: 500, registrations: [], waitlist: [],
+          mode: 'Offline', imageUrl: '', youtubeUrl: '', richDescription: 'Music, dance and drama performances by students.'
         },
         {
           id: 'e3', title: 'Career Fair', category: 'Career',
@@ -38,10 +43,13 @@ const Store = (() => {
           date: new Date(now + 2 * 86400000).toISOString().split('T')[0],
           deadline: new Date(now + 1 * 86400000).toISOString().split('T')[0],
           venue: 'Sports Complex', organiser: 'Alice Organiser',
-          maxSeats: 300, registrations: [],
+          maxSeats: 300, registrations: [], waitlist: [],
+          mode: 'Offline', imageUrl: '', youtubeUrl: '', richDescription: 'Top companies recruiting on campus. Bring your resume!'
         },
       ]));
     }
+    if (!localStorage.getItem(FEEDBACKS_KEY)) localStorage.setItem(FEEDBACKS_KEY, '[]');
+    if (!localStorage.getItem(TEAMS_KEY))     localStorage.setItem(TEAMS_KEY, '[]');
   }
 
   // Users
@@ -56,10 +64,15 @@ const Store = (() => {
   }
   function registerUser(name, email, password, role = 'student') {
     const users = getUsers();
-    const user = { id: 'u' + Date.now(), name, email, password, role };
+    const user = { id: 'u' + Date.now(), name, email, password, role, avatar: '', department: '', github: '', linkedin: '' };
     users.push(user);
     saveUsers(users);
     return user;
+  }
+  function updateUser(updated) {
+    const users = getUsers().map(u => u.id === updated.id ? { ...u, ...updated } : u);
+    saveUsers(users);
+    if (getSession()?.id === updated.id) setSession(updated);
   }
 
   // Session
@@ -75,6 +88,7 @@ const Store = (() => {
     const events = getEvents();
     ev.id = 'e' + Date.now();
     ev.registrations = [];
+    ev.waitlist = [];
     events.push(ev);
     saveEvents(events);
     return ev;
@@ -88,8 +102,13 @@ const Store = (() => {
   }
   function registerForEvent(eventId, userId) {
     const events = getEvents().map(e => {
-      if (e.id === eventId && !e.registrations.includes(userId)) {
-        return { ...e, registrations: [...e.registrations, userId] };
+      if (e.id === eventId) {
+        if (!e.registrations.includes(userId) && (!e.waitlist || !e.waitlist.includes(userId))) {
+          if (e.registrations.length >= e.maxSeats) {
+            return { ...e, waitlist: [...(e.waitlist || []), userId] };
+          }
+          return { ...e, registrations: [...e.registrations, userId] };
+        }
       }
       return e;
     });
@@ -98,11 +117,53 @@ const Store = (() => {
   function unregisterFromEvent(eventId, userId) {
     const events = getEvents().map(e => {
       if (e.id === eventId) {
-        return { ...e, registrations: e.registrations.filter(id => id !== userId) };
+        let regs = e.registrations.filter(id => id !== userId);
+        let wl = (e.waitlist || []).filter(id => id !== userId);
+        if (e.registrations.includes(userId) && wl.length > 0 && regs.length < e.maxSeats) {
+          regs.push(wl.shift());
+        }
+        return { ...e, registrations: regs, waitlist: wl };
       }
       return e;
     });
     saveEvents(events);
+  }
+
+  // Teams
+  function getTeams() { return JSON.parse(localStorage.getItem(TEAMS_KEY) || '[]'); }
+  function saveTeams(t) { localStorage.setItem(TEAMS_KEY, JSON.stringify(t)); }
+  function createTeam(name, ownerId) {
+    const teams = getTeams();
+    const code = Math.random().toString(36).substring(2, 8).toUpperCase();
+    const team = { id: 't' + Date.now(), name, code, members: [ownerId] };
+    teams.push(team);
+    saveTeams(teams);
+    return team;
+  }
+  function joinTeam(code, userId) {
+    const teams = getTeams();
+    const team = teams.find(t => t.code === code);
+    if (team && !team.members.includes(userId)) {
+      team.members.push(userId);
+      saveTeams(teams);
+      return team;
+    }
+    return null;
+  }
+  function getUserTeams(userId) {
+    return getTeams().filter(t => t.members.includes(userId));
+  }
+
+  // Feedbacks
+  function getFeedbacks() { return JSON.parse(localStorage.getItem(FEEDBACKS_KEY) || '[]'); }
+  function saveFeedbacks(f) { localStorage.setItem(FEEDBACKS_KEY, JSON.stringify(f)); }
+  function addFeedback(eventId, userId, rating, review) {
+    const f = getFeedbacks();
+    f.push({ id: 'f' + Date.now(), eventId, userId, rating, review, date: new Date().toISOString() });
+    saveFeedbacks(f);
+  }
+  function getEventFeedbacks(eventId) {
+    return getFeedbacks().filter(f => f.eventId === eventId);
   }
 
   // Deadline helpers
@@ -121,10 +182,13 @@ const Store = (() => {
 
   init();
   return {
-    findUser, emailExists, registerUser,
+    findUser, emailExists, registerUser, updateUser,
     setSession, getSession, clearSession,
     getEvents, addEvent, updateEvent, deleteEvent,
     registerForEvent, unregisterFromEvent,
     daysUntil, deadlineStatus,
+    getTeams, createTeam, joinTeam, getUserTeams,
+    getFeedbacks, addFeedback, getEventFeedbacks,
+    getUsers
   };
 })();

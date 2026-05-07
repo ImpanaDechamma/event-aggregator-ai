@@ -29,9 +29,9 @@ function renderAuth() {
 
          <div style="width: 100%; max-width: 380px;">
            <!-- Mobile Logo -->
-           <div class="logo" style="cursor: pointer; font-size: 1.5rem; font-weight: 800; color: white; margin-bottom: 40px; display: block; @media(min-width: 768px) { display: none; }" onclick="App.navigate('landing')">EventHub</div>
+           <div class="logo" style="cursor: pointer; font-size: 1.5rem; font-weight: 800; color: var(--primary); margin-bottom: 40px; display: block; @media(min-width: 768px) { display: none; }" onclick="App.navigate('landing')">EventHub</div>
 
-           <h2 style="font-size: 2rem; margin-bottom: 8px; color: white; font-weight: 700;">${mode === 'login' ? 'Welcome back' : 'Create an account'}</h2>
+           <h2 style="font-size: 2rem; margin-bottom: 8px; color: var(--text-main); font-weight: 700;">${mode === 'login' ? 'Welcome back' : 'Create an account'}</h2>
            <p style="color: var(--text-muted); margin-bottom: 32px; font-size: 0.95rem;">${mode === 'login' ? 'Please enter your details to sign in.' : 'Get started with your free account.'}</p>
 
            ${error ? `<div class="alert alert-error" style="font-size: 0.9rem;">${error}</div>` : ''}
@@ -50,18 +50,18 @@ function renderAuth() {
 
   function loginForm() {
     return `
-      <div style="display: flex; background: rgba(255,255,255,0.03); padding: 4px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 24px;">
+      <div style="display: flex; background: var(--surface-hover); padding: 4px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 24px;">
         <button style="flex: 1; padding: 10px; border: none; border-radius: 6px; background: ${role === 'student' ? 'var(--primary)' : 'transparent'}; color: ${role === 'student' ? 'white' : 'var(--text-muted)'}; cursor: pointer; font-family: inherit; font-size: 0.9rem; font-weight: 600; transition: all 0.3s;" onclick="authSetRole('student')">Student</button>
         <button style="flex: 1; padding: 10px; border: none; border-radius: 6px; background: ${role === 'organiser' ? 'var(--primary)' : 'transparent'}; color: ${role === 'organiser' ? 'white' : 'var(--text-muted)'}; cursor: pointer; font-family: inherit; font-size: 0.9rem; font-weight: 600; transition: all 0.3s;" onclick="authSetRole('organiser')">Organiser</button>
       </div>
 
       <div class="form-group" style="margin-bottom: 20px;">
         <label style="color: var(--text-main); font-weight: 500; font-size: 0.85rem;">Email</label>
-        <input id="auth-email" type="email" placeholder="name@college.edu" style="background: transparent; border-color: rgba(255,255,255,0.15);" />
+        <input id="auth-email" type="email" placeholder="name@college.edu" style="background: var(--surface); border-color: var(--border-color);" />
       </div>
       <div class="form-group" style="margin-bottom: 24px;">
         <label style="color: var(--text-main); font-weight: 500; font-size: 0.85rem;">Password</label>
-        <input id="auth-pass" type="password" placeholder="••••••••" style="background: transparent; border-color: rgba(255,255,255,0.15);" />
+        <input id="auth-pass" type="password" placeholder="••••••••" style="background: var(--surface); border-color: var(--border-color);" />
       </div>
       <button class="btn btn-primary btn-full glow-btn" style="margin-top: 8px;" onclick="authLogin()">
         Sign In
@@ -72,30 +72,30 @@ function renderAuth() {
         <span style="position: relative; z-index: 2; background: var(--bg-color); padding: 0 12px; color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px;">Demo Access</span>
       </div>
       <div style="display: flex; gap: 12px; margin-top: 20px;">
-        <button class="btn btn-outline btn-sm" style="flex: 1; border-color: rgba(255,255,255,0.15); color: var(--text-main);" onclick="demoLogin('alice@college.edu', 'alice123', 'organiser')">Organiser</button>
-        <button class="btn btn-outline btn-sm" style="flex: 1; border-color: rgba(255,255,255,0.15); color: var(--text-main);" onclick="demoLogin('bob@college.edu', 'bob123', 'student')">Student</button>
+        <button class="btn btn-outline btn-sm" style="flex: 1; border-color: var(--border-color); color: var(--text-main);" onclick="demoLogin('alice@college.edu', 'alice123', 'organiser')">Organiser</button>
+        <button class="btn btn-outline btn-sm" style="flex: 1; border-color: var(--border-color); color: var(--text-main);" onclick="demoLogin('bob@college.edu', 'bob123', 'student')">Student</button>
       </div>
     `;
   }
 
   function registerForm() {
     return `
-      <div style="display: flex; background: rgba(255,255,255,0.03); padding: 4px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 24px;">
+      <div style="display: flex; background: var(--surface-hover); padding: 4px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 24px;">
         <button style="flex: 1; padding: 10px; border: none; border-radius: 6px; background: ${role === 'student' ? 'var(--primary)' : 'transparent'}; color: ${role === 'student' ? 'white' : 'var(--text-muted)'}; cursor: pointer; font-family: inherit; font-size: 0.9rem; font-weight: 600; transition: all 0.3s;" onclick="authSetRole('student')">Student</button>
         <button style="flex: 1; padding: 10px; border: none; border-radius: 6px; background: ${role === 'organiser' ? 'var(--primary)' : 'transparent'}; color: ${role === 'organiser' ? 'white' : 'var(--text-muted)'}; cursor: pointer; font-family: inherit; font-size: 0.9rem; font-weight: 600; transition: all 0.3s;" onclick="authSetRole('organiser')">Organiser</button>
       </div>
 
       <div class="form-group" style="margin-bottom: 20px;">
         <label style="color: var(--text-main); font-weight: 500; font-size: 0.85rem;">Full Name</label>
-        <input id="reg-name" type="text" placeholder="John Doe" style="background: transparent; border-color: rgba(255,255,255,0.15);" />
+        <input id="reg-name" type="text" placeholder="John Doe" style="background: var(--surface); border-color: var(--border-color);" />
       </div>
       <div class="form-group" style="margin-bottom: 20px;">
         <label style="color: var(--text-main); font-weight: 500; font-size: 0.85rem;">Email Address</label>
-        <input id="reg-email" type="email" placeholder="name@college.edu" style="background: transparent; border-color: rgba(255,255,255,0.15);" />
+        <input id="reg-email" type="email" placeholder="name@college.edu" style="background: var(--surface); border-color: var(--border-color);" />
       </div>
       <div class="form-group" style="margin-bottom: 24px;">
         <label style="color: var(--text-main); font-weight: 500; font-size: 0.85rem;">Password</label>
-        <input id="reg-pass" type="password" placeholder="Min 6 characters" style="background: transparent; border-color: rgba(255,255,255,0.15);" />
+        <input id="reg-pass" type="password" placeholder="Min 6 characters" style="background: var(--surface); border-color: var(--border-color);" />
       </div>
       <button class="btn btn-primary btn-full glow-btn" style="margin-top: 8px;" onclick="authRegister()">
         Create Account
